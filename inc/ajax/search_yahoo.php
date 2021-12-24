@@ -173,7 +173,8 @@ function set_item_data_by_yahoo_api( $items_data, $keywords = '' ) {
 
 		// 商品情報
 		$item['info']     = $data['brand']['name'] ?? $data['seller']['name'] ?? '';
-		$item['price']    = $data['price'] ?? '';
+		$price            = $data['price'] ?? '';
+		$item['price']    = (string) $price;
 		$item['price_at'] = wp_date( 'Y/m/d H:i' );
 
 		$is_taxable = $data['priceLabel']['taxable'] ?? '';

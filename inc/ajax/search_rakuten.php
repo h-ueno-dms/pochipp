@@ -192,7 +192,8 @@ function set_item_data_by_rakuten_api( $items_data, $keywords = '' ) {
 		}
 
 		// 価格
-		$data['price']    = $item['Item']['itemPrice'] ?? '';
+		$price            = $item['Item']['itemPrice'] ?? '';
+		$data['price']    = (string) $price;
 		$data['price_at'] = wp_date( 'Y/m/d H:i' );
 
 		// memo: とりあえず不要

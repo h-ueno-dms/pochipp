@@ -101,6 +101,9 @@ registerBlockType(name, {
 	edit: ({ attributes, setAttributes, clientId, isSelected }) => {
 		const { pid, title, info, isCount, cvKey } = attributes;
 
+		// ポチップ設定データ
+		const pchppVars = window.pchppVars || {};
+
 		// 投稿IDを取得
 		const postId = useSelect((select) => select('core/editor').getCurrentPostId(), []);
 
@@ -368,29 +371,35 @@ registerBlockType(name, {
 								className='pchpp-hideCheck'
 								checked={attributes.hideInfo}
 								onChange={(checked) => {
-									setAttributes({
-										hideInfo: checked,
-									});
+									setAttributes({ hideInfo: checked });
 								}}
 							/>
-							<CheckboxControl
-								label='価格を非表示'
-								className='pchpp-hideCheck'
-								checked={attributes.hidePrice}
-								onChange={(checked) => {
-									setAttributes({
-										hidePrice: checked,
-									});
-								}}
-							/>
+							{!hasRegisterdItem && pchppVars.displayPrice !== 'off' && (
+								<CheckboxControl
+									label='価格を非表示'
+									className='pchpp-hideCheck'
+									checked={attributes.hidePrice}
+									onChange={(checked) => {
+										setAttributes({ hidePrice: checked });
+									}}
+								/>
+							)}
+							{!hasRegisterdItem && pchppVars.displayPrice === 'off' && (
+								<CheckboxControl
+									label='価格を表示する'
+									className='pchpp-hideCheck'
+									checked={attributes.showPrice}
+									onChange={(checked) => {
+										setAttributes({ showPrice: checked });
+									}}
+								/>
+							)}
 							<CheckboxControl
 								label='Amazonボタンを非表示'
 								className='pchpp-hideCheck'
 								checked={attributes.hideAmazon}
 								onChange={(checked) => {
-									setAttributes({
-										hideAmazon: checked,
-									});
+									setAttributes({ hideAmazon: checked });
 								}}
 							/>
 							<CheckboxControl
@@ -398,9 +407,7 @@ registerBlockType(name, {
 								className='pchpp-hideCheck'
 								checked={attributes.hideRakuten}
 								onChange={(checked) => {
-									setAttributes({
-										hideRakuten: checked,
-									});
+									setAttributes({ hideRakuten: checked });
 								}}
 							/>
 							<CheckboxControl
@@ -408,9 +415,7 @@ registerBlockType(name, {
 								className='pchpp-hideCheck'
 								checked={attributes.hideYahoo}
 								onChange={(checked) => {
-									setAttributes({
-										hideYahoo: checked,
-									});
+									setAttributes({ hideYahoo: checked });
 								}}
 							/>
 						</PanelBody>
@@ -422,9 +427,7 @@ registerBlockType(name, {
 										className='pchpp-hideCheck'
 										checked={attributes.hideCustom}
 										onChange={(checked) => {
-											setAttributes({
-												hideCustom: checked,
-											});
+											setAttributes({ hideCustom: checked });
 										}}
 									/>
 									<CheckboxControl
@@ -432,9 +435,7 @@ registerBlockType(name, {
 										className='pchpp-hideCheck'
 										checked={attributes.hideCustom2}
 										onChange={(checked) => {
-											setAttributes({
-												hideCustom2: checked,
-											});
+											setAttributes({ hideCustom2: checked });
 										}}
 									/>
 									<p>
@@ -451,36 +452,28 @@ registerBlockType(name, {
 										label='カスタムボタンのURL'
 										value={attributes.custom_btn_url}
 										onChange={(newText) => {
-											setAttributes({
-												custom_btn_url: newText,
-											});
+											setAttributes({ custom_btn_url: newText });
 										}}
 									/>
 									<TextControl
 										label='カスタムボタンのテキスト'
 										value={attributes.custom_btn_text}
 										onChange={(newText) => {
-											setAttributes({
-												custom_btn_text: newText,
-											});
+											setAttributes({ custom_btn_text: newText });
 										}}
 									/>
 									<TextControl
 										label='カスタムボタン2のURL'
 										value={attributes.custom_btn_url_2}
 										onChange={(newText) => {
-											setAttributes({
-												custom_btn_url_2: newText,
-											});
+											setAttributes({ custom_btn_url_2: newText });
 										}}
 									/>
 									<TextControl
 										label='カスタムボタン2のテキスト'
 										value={attributes.custom_btn_text_2}
 										onChange={(newText) => {
-											setAttributes({
-												custom_btn_text_2: newText,
-											});
+											setAttributes({ custom_btn_text_2: newText });
 										}}
 									/>
 								</>

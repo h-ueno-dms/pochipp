@@ -107,14 +107,6 @@ function cb_pochipp_block( $attrs, $content ) {
 		}
 	}
 
-	// 定期的な情報更新
-	if ( $pid ) {
-		\POCHIPP::periodic_update_pochipp_data( $pid, $metadata );
-	}
-	// else {
-	// 	\POCHIPP::periodic_update_block_cache( $attrs );
-	// }
-
 	// 空情報を削除
 	$attrs = array_filter( $attrs, function ( $elem ) {
 		return ! empty( $elem );
@@ -138,7 +130,7 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 		'keywords'           => '',
 		'searched_at'        => '',
 		'asin'               => '',
-		// 'itemcode'           => '',
+		'itemcode'           => '',
 		// 'seller_id'     => '',
 		'amazon_affi_url'    => '',
 		'rakuten_detail_url' => '',
@@ -148,12 +140,14 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 		'price'              => 0,
 		'price_at'           => '',
 		'image_url'          => '',
+		'image_id'           => '',
 		'custom_btn_url'     => '',
 		'custom_btn_text'    => '',
 		'custom_btn_url_2'   => '',
 		'custom_btn_text_2'  => '',
 		'hideInfo'           => false,
 		'hidePrice'          => false,
+		'showPrice'          => false,
 		'hideAmazon'         => false,
 		'hideRakuten'        => false,
 		'hideYahoo'          => false,
@@ -171,6 +165,7 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 	$searched_at       = $pdata['searched_at'];
 	$asin              = $pdata['asin'];
 	$image_url         = $pdata['image_url'];
+	$image_id          = $pdata['image_id'];
 	$custom_btn_url    = $pdata['custom_btn_url'];
 	$custom_btn_text   = $pdata['custom_btn_text'];
 	$custom_btn_url_2  = $pdata['custom_btn_url_2'];
@@ -185,6 +180,14 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 	$amazon_aid  = \POCHIPP::get_setting( 'moshimo_amazon_aid' );
 	$rakuten_aid = \POCHIPP::get_setting( 'moshimo_rakuten_aid' );
 	$yahoo_aid   = \POCHIPP::get_setting( 'moshimo_yahoo_aid' );
+
+	// 価格を表示するかどうか
+	$show_price = \POCHIPP::get_setting( 'display_price' ) !== 'off';
+	if ( ! $show_price && $pdata['showPrice'] ) {
+		$show_price = true;
+	} elseif ( $show_price && $pdata['hidePrice'] ) {
+		$show_price = false;
+	}
 
 	// AmazonボタンURL
 	if ( apply_filters( 'pochipp_show_amazon_btn', ! $pdata['hideAmazon'], $pid ) ) {
@@ -226,17 +229,7 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 	}
 
 	// 商品画像
-	if ( $image_url ) {
-
-		// amazon かつ ?_exがない場合 かつ thumbnail.image.rakuten.co.jpの画像 の場合
-		if ( 'rakuten' === $searched_at && false === strpos( $image_url, '?_ex' ) && false !== strpos( $image_url, 'thumbnail.image.rakuten.co.jp' ) ) {
-			$image_url .= '?_ex=400x400';
-		}
-		// amazon かつ _SLがない場合 かつ media-amazon.comの画像 の場合
-		if ( 'amazon' === $searched_at && false === strpos( $image_url, '_SL' ) && false !== strpos( $image_url, 'media-amazon.com' ) ) {
-			$image_url = str_replace( '.jpg', '._SL400_.jpg', $image_url );
-		}
-	}
+	$item_image = \POCHIPP::get_item_image( $image_id, $image_url, $searched_at );
 
 	$is_blank = \POCHIPP::get_setting( 'show_amazon_normal_link' );
 	if ( $is_blank ) {
@@ -271,6 +264,10 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 	if ( $pdata['isCount'] && $pdata['cvKey'] ) {
 		$ex_props .= ' data-cvkey="' . esc_attr( $pdata['cvKey'] ) . '"';
 	}
+	if ( $pid && \POCHIPP::should_periodic_update( $pdata ) ) {
+		$ex_props                .= ' data-auto-update="true"';
+		\POCHIPP::$load_update_js = true;
+	}
 
 	// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped
 	?>
@@ -284,10 +281,10 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 			data-sale-effect="<?php echo esc_attr( \POCHIPP::get_setting( 'sale_text_effect' ) ); ?>"
 			<?php echo $ex_props; ?>
 		>
-			<?php if ( $image_url ) : ?>
+			<?php if ( $item_image ) : ?>
 				<div class="pochipp-box__image">
 					<a href="<?php echo esc_url( $main_url ); ?>" <?php echo $rel_target; ?>>
-						<img src="<?php echo esc_url( $image_url ); ?>" alt="" />
+						<?php echo $item_image; // ignore:phpcs ?>
 					</a>
 				</div>
 			<?php endif; ?>
@@ -302,7 +299,7 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 					<div class="pochipp-box__info"><?php echo esc_html( $pdata['info'] ); ?></div>
 				<?php endif; ?>
 
-				<?php if ( ! $pdata['hidePrice'] && $pdata['price'] ) : ?>
+				<?php if ( $show_price && $pdata['price'] ) : ?>
 					<div class="pochipp-box__price">
 						¥<?php echo esc_html( number_format( (int) $pdata['price'] ) ); ?>
 						<span>（<?php echo esc_html( $price_memo ); ?>）</span>
@@ -330,12 +327,6 @@ function render_pochipp_block( $title = '', $pdata = [] ) {
 					'btn_layout_sp'     => $pdata['btnLayoutSP'],
 				]);
 			?>
-			<?php if ( apply_filters( 'pochipp_show_box_logo', 1 ) ) : ?>
-				<div class="pochipp-box__logo">
-					<img src="<?php echo esc_url( POCHIPP_URL ); ?>assets/img/pochipp-logo-t1.png" alt="" width="32" height="32">
-					<span>ポチップ</span>
-				</div>
-			<?php endif; ?>
 		</div>
 	<?php
 	// phpcs:enable WordPress.Security.EscapeOutput.OutputNotEscaped

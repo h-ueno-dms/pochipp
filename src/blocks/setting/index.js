@@ -110,6 +110,22 @@ registerBlockType(name, {
 		const parsedMeta = useMemo(() => getParsedMeta(meta), [meta]);
 		// console.log(meta, parsedMeta);
 
+		// カスタム画像データを取得
+		const customImgId = parsedMeta.image_id || 0;
+		// console.log(customImgId);
+		const customImgUrl = useSelect(
+			(select) => {
+				if (!customImgId) return '';
+				const mediaData = select('core').getMedia(customImgId);
+				if (!mediaData) {
+					return '';
+				}
+				return mediaData.source_url;
+			},
+			[customImgId]
+		);
+		// console.log(customImgUrl);
+
 		const updateMetadata = useCallback(
 			(key, newVal) => {
 				parsedMeta[key] = newVal;
@@ -211,7 +227,7 @@ registerBlockType(name, {
 						'data-sticky': isStickey ? '1' : null,
 					})}
 				>
-					<ItemPreview {...{ postTitle, parsedMeta }} />
+					<ItemPreview {...{ postTitle, customImgUrl, parsedMeta }} />
 					<div className='__settings'>
 						<div className='__btns'>
 							<SearchBtn onClick={openThickbox} text={hasSearchedItem ? '商品を再検索' : '商品を検索'} />
@@ -240,7 +256,7 @@ registerBlockType(name, {
 										}}
 									/>
 								</div>
-								<ItemSetting {...{ postTitle, parsedMeta, updateMetadata }} />
+								<ItemSetting {...{ postTitle, parsedMeta, updateMetadata, customImgUrl }} />
 							</div>
 						)}
 						{/* <div>【開発用】データ確認</div>

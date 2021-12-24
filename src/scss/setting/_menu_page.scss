@@ -199,6 +199,7 @@
 				}
 			}
 		}
+
 	}
 
 	.pchpp-setting__body {
@@ -291,6 +292,10 @@
 		margin: 0;
 		padding-left: 8px;
 
+		.errMessage {
+			color: #d63638;
+		}
+
 		&.-flex {
 			display: flex;
 			flex-wrap: wrap;
@@ -299,8 +304,24 @@
 				margin-right: 16px;
 			}
 		}
+
+		.flex__div {
+			display: flex;
+			align-items: center;
+
+			img:hover {
+				cursor: pointer;
+			}
+
+			span {
+				margin-left: 4px;
+			}
+		}
 	}
 
+	&.-no-margin-top:not(:first-child) {
+		margin-top: 1em;
+	}
 
 	@include pc_admin {
 		display: flex;

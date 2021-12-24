@@ -34,7 +34,14 @@
 			margin: 0 !important;
 		}
 	}
+
 }
+
+// 非フォーカス時からクリックするとなぜか最初のテキストフィールドにフォーカスが飛ぶのを防ぐ
+[data-type="pochipp/setting"]:not(.is-selected) .components-base-control.-custom-image {
+	pointer-events: none;
+}
+
 
 // 投稿一覧テーブル
 .manage-column#pid {
@@ -53,8 +60,18 @@
 	width: 15em;
 }
 
+td.column-pimg {
+
+	img {
+		display: block;
+		width: 48px;
+		height: auto;
+	}
+}
+
 td.used_at.column-used_at {
 	display: flex;
+	flex-wrap: wrap;
 
 	.pchpp-usepage {
 

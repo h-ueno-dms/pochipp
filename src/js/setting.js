@@ -12,6 +12,7 @@
 			const $boxPreview = $('.pchpp-setting__preview');
 			const $box = $boxPreview.find('.pochipp-box');
 			const $btns = $boxPreview.find('.pochipp-box__btns');
+			const $price = $boxPreview.find('.pochipp-box__price');
 
 			// レイアウト PC
 			$('[name="pochipp_settings[box_layout_pc]"]').change(function () {
@@ -53,6 +54,12 @@
 			$('[name="pochipp_settings[max_column_mb]"]').change(function () {
 				const thisVal = $(this).val();
 				$btns.attr('data-maxclmn-mb', thisVal);
+			});
+
+			// display_price
+			$('[name="pochipp_settings[display_price]"]').change(function () {
+				const thisVal = $(this).val();
+				$price.attr('data-disp-price', thisVal);
 			});
 		})();
 	});

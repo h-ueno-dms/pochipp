@@ -90,6 +90,10 @@
             "type": "boolean",
             "default": false
         },
+        "showPrice": {
+            "type": "boolean",
+            "default": false
+        },
         "hideAmazon": {
             "type": "boolean",
             "default": false

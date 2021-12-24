@@ -297,6 +297,10 @@ trait Helper {
 			// マージ
 			$metadata['post_id'] = get_the_ID();
 			$metadata['title']   = get_the_title();
+			$image_id            = $metadata['image_id'] ?: 0;
+			if ( $image_id ) {
+				$metadata['custom_image_url'] = wp_get_attachment_image_url( $image_id, 'medium' );
+			}
 
 			$datas[] = $metadata;
 		endwhile;
@@ -323,29 +327,10 @@ trait Helper {
 		return $datas;
 	}
 
-
 	/**
-	 *  ポチップ管理商品のデータ更新処理
+	 * metadataからitemcodeを取得する
 	 */
-	// public static function update_pochipp_item_data() {}
-
-
-	/**
-	 * ポチップ管理商品の定期的なデータ更新
-	 */
-	public static function periodic_update_pochipp_data( $pid, $metadata ) {
-
-		// 定期更新機能がオフなら即 return
-		if ( ! \POCHIPP::get_setting( 'auto_update' ) ) return;
-
-		$price_at = $metadata['price_at'] ?? '';
-		if ( ! $price_at) return;
-
-		$now_time = strtotime( wp_date( 'Y/m/d H:i' ) );
-
-		// 1週間経過しているかどうか。 ( 単位: seconds days week )
-		if ( strtotime( $price_at ) > strtotime( '-1 week', $now_time ) ) return;
-
+	public static function get_itemcode_from_metadata( $metadata ) {
 		$searched_at = $metadata['searched_at'] ?? '';
 		$itemcode    = '';
 		if ( 'amazon' === $searched_at ) {
@@ -356,21 +341,43 @@ trait Helper {
 		//  elseif ( 'yahoo' === $searched_at ) {
 		// 	$itemcode = $metadata['yahoo_itemcode'];
 		// }
+		if ( ! $itemcode ) return '';
 
-		// itemcode なければ
-		if ( ! $itemcode) return;
-
-		// 商品データ取得
-		$datas = \POCHIPP::get_item_data( $searched_at, $itemcode );
-
-		// 何かエラーがあれば -> 取り扱いなくなったかどうかの判定を記録する？
-		if ( isset( $datas['error'] ) ) return;
-
-		// 更新
-		$new_metadata = array_merge( $metadata, $datas[0] );
-		update_post_meta( $pid, \POCHIPP::META_SLUG, json_encode( $new_metadata, JSON_UNESCAPED_UNICODE ) );
+		return $itemcode;
 	}
 
+
+	/**
+	 *  ポチップ管理商品のデータ更新処理
+	 */
+	// public static function update_pochipp_item_data() {}
+
+
+	/**
+	 * ポチップ管理商品の定期的なデータ更新を行うか
+	 */
+	public static function should_periodic_update( $metadata ) {
+
+		// 定期更新機能がオフなら即 return
+		if ( ! \POCHIPP::get_setting( 'auto_update' ) ) return false;
+
+		// yahooデータは(今のところ)更新しない
+		$searched_at = $metadata['searched_at'] ?? '';
+		if ( 'yahoo' === $searched_at ) return false;
+
+		$price_at = $metadata['price_at'] ?? '';
+		if ( ! $price_at ) return false;
+
+		$now_time = strtotime( wp_date( 'Y/m/d H:i' ) );
+
+		// 1週間経過しているかどうか。 ( 単位: seconds days week )
+		if ( strtotime( $price_at ) > strtotime( '-1 week', $now_time ) ) return false;
+
+		if ( ! \POCHIPP::get_itemcode_from_metadata( $metadata ) ) return false;
+
+		// 定期更新の処理を行う
+		return true;
+	}
 
 	/**
 	 * ポストタイプのチェック
@@ -394,5 +401,41 @@ trait Helper {
 			}
 		}
 		return ( $now_pt === $post_type );
+	}
+
+	/**
+	 * 商品画像を取得
+	 */
+	public static function get_item_image( $image_id, $image_url, $searched_at = '' ) {
+		$image = '';
+
+		// idがあれば
+		if ( $image_id ) {
+			$image_src = wp_get_attachment_image_src( $image_id, 'medium', false );
+
+			if ( $image_src ) {
+				list( $src, $width, $height ) = $image_src;
+
+				$img_props = image_hwstring( $width, $height ) . ' src="' . esc_url( $src ) . '" alt=""';
+
+				$image = '<img ' . trim( $img_props ) . '/>';
+			}
+}
+
+		if ( '' === $image && $image_url ) {
+
+			// amazon かつ ?_exがない場合 かつ thumbnail.image.rakuten.co.jpの画像 の場合
+			if ( 'rakuten' === $searched_at && false === strpos( $image_url, '?_ex' ) && false !== strpos( $image_url, 'thumbnail.image.rakuten.co.jp' ) ) {
+				$image_url .= '?_ex=400x400';
+			}
+			// amazon かつ _SLがない場合 かつ media-amazon.comの画像 の場合
+			if ( 'amazon' === $searched_at && false === strpos( $image_url, '_SL' ) && false !== strpos( $image_url, 'media-amazon.com' ) ) {
+				$image_url = str_replace( '.jpg', '._SL400_.jpg', $image_url );
+			}
+
+			$image = '<img src="' . esc_url( $image_url ) . '" alt="" />';
+		}
+
+		return $image;
 	}
 }

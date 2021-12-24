@@ -25,10 +25,14 @@ class Data {
 		'btn_radius'             => 'off',
 		'max_column_pc'          => 'fit',
 		'max_column_mb'          => '1',
+		'display_price'          => 'on',
 		'amazon_btn_text'        => 'Amazon',
 		'rakuten_btn_text'       => '楽天市場',
 		'yahoo_btn_text'         => 'Yahooショッピング',
 		'paypay_btn_text'        => 'PayPayモール',
+		'amazon_btn_color'       => '#f99a0c',
+		'rakuten_btn_color'      => '#e0423c',
+		'yahoo_btn_color'        => '#438ee8',
 		'custom_btn_color'       => '#5ca250',
 		'custom_btn_color_2'     => '#8e59e4',
 		'show_rakuten_5campaign' => '1',
@@ -81,5 +85,8 @@ class Data {
 
 	// ライセンス設定をオンにするかどうか
 	public static $use_licence = false;
+
+	// 商品情報更新スクリプトを読み込むかどうか
+	public static $load_update_js = false;
 
 }

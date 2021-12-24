@@ -15,9 +15,6 @@
 }
 
 :root {
-	--pchpp-color-amazon: #f99a0c;
-	--pchpp-color-rakuten: #e0423c;
-	--pchpp-color-yahoo: #438ee8;
 	--pchpp-color-paypay: #b9a01a;
 
 }
@@ -198,6 +195,10 @@
 
 .pochipp-box__btnwrap {
 
+	span {
+		width: 100%;
+	}
+
 	// 詳細度強く
 	.pochipp-box & {
 		min-width: max-content;
@@ -343,6 +344,10 @@
 	}
 
 
+}
+
+.pochipp-box__price[data-disp-price="off"] {
+	display: none;
 }
 
 // ボタンスタイル

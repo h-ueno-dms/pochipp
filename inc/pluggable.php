@@ -10,7 +10,7 @@ if ( ! function_exists( '\POCHIPP\set_sale_data' ) ) {
 	function set_sale_data() {
 
 		$jp_timezone = new \DateTimeZone( 'Asia/Tokyo' );
-		$date        = (int) wp_date( 'YmdGi', null, $jp_timezone );
+		$date        = (int) wp_date( 'YmdHi', null, $jp_timezone );
 
 		// amazon
 		$startline = (int) preg_replace( '/[^0-9]/', '', \POCHIPP::get_setting( 'amazon_sale_startline' ) );

@@ -53,21 +53,22 @@ function output_custom_post_columns( $column_name, $post_id ) {
 
 	} elseif ( 'pimg' === $column_name ) {
 
-		$image_url = $pchpp_metas['image_url'] ?? '';
-		if ( $image_url ) {
-			echo '<img src="' . esc_attr( $image_url ) . '" alt="" width="48"/>';
-		} else {
-			'-';
-		}
+		$image_id    = $pchpp_metas['image_id'] ?? '';
+		$image_url   = $pchpp_metas['image_url'] ?? '';
+		$searched_at = $pchpp_metas['searched_at'] ?? '';
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo \POCHIPP::get_item_image( $image_id, $image_url, $searched_at );
+
 	} elseif ( 'used_at' === $column_name ) {
 		$args = [
 			'post_type'              => [ 'post', 'page' ],
 			'no_found_rows'          => true,
 			'posts_per_page'         => -1,
-			'update_post_term_cache' => false,
-			'update_post_meta_cache' => false,
 			's'                      => 'wp:pochipp/linkbox "pid":' . $post_id,
 		];
+
+		$used_count = get_post_meta( $post_id, 'used_count', true ) ?: 0;
 
 		$count     = 0;
 		$the_query = new \WP_Query( $args );
@@ -91,7 +92,10 @@ function output_custom_post_columns( $column_name, $post_id ) {
 		}
 		wp_reset_postdata();
 
-		update_post_meta( $post_id, 'used_count', $count );
+		// 使用回数、変わってた時だけ更新
+		if ( (int) $used_count !== $count ) {
+			update_post_meta( $post_id, 'used_count', $count );
+		}
 	}
 
 }

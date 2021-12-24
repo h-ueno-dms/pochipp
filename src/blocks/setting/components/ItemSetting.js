@@ -1,7 +1,9 @@
 /**
  * @WordPress dependencies
  */
-import { memo } from '@wordpress/element';
+// import { memo } from '@wordpress/element';
+// import { useSelect } from '@wordpress/data';
+import { applyFilters, hasFilter } from '@wordpress/hooks';
 import { TextControl, CheckboxControl, RadioControl, BaseControl } from '@wordpress/components';
 
 /**
@@ -23,9 +25,30 @@ const btnLayoutsSP = [
 /**
  * ItemPreview
  */
-export default memo(({ postTitle, parsedMeta, updateMetadata }) => {
+export default ({ postTitle, parsedMeta, updateMetadata, customImgUrl }) => {
+	// ポチップ設定データ
+	const pchppVars = window.pchppVars || {};
+
 	// タイトル更新用関数
 	const { editPost } = wp.data.dispatch('core/editor');
+
+	const ExSettting = () => {
+		if (!hasFilter('pochipp.exSetting', 'pochipp-pro')) {
+			return (
+				<p style={{ fontSize: '13px' }}>
+					<a href='https://pochipp.com/pochipp-pro/' target='_blank' rel='noreferrer'>
+						Pochipp Pro
+					</a>
+					を導入すると、メディアライブラリ内から商品画像を設定できるようになります。
+				</p>
+			);
+		}
+
+		// {...{ customImgUrl, parsedMeta, updateMetadata }}
+		const args = { customImgUrl, parsedMeta, updateMetadata };
+
+		return applyFilters('pochipp.exSetting', null, args);
+	};
 
 	return (
 		<>
@@ -116,15 +139,31 @@ export default memo(({ postTitle, parsedMeta, updateMetadata }) => {
 				}}
 			/>
 			<BaseControl>
-				<BaseControl.VisualLabel>情報の非表示</BaseControl.VisualLabel>
-				<CheckboxControl
-					label='価格情報を表示しない'
-					checked={parsedMeta.hidePrice}
-					onChange={(checked) => {
-						updateMetadata('hidePrice', checked);
-					}}
-				/>
+				<BaseControl.VisualLabel>情報の表示</BaseControl.VisualLabel>
+				{pchppVars.displayPrice === 'off' ? (
+					<CheckboxControl
+						label='価格情報を表示する'
+						checked={parsedMeta.showPrice}
+						onChange={(checked) => {
+							updateMetadata('showPrice', checked);
+						}}
+					/>
+				) : (
+					<CheckboxControl
+						label='価格情報を隠す'
+						checked={parsedMeta.hidePrice}
+						onChange={(checked) => {
+							updateMetadata('hidePrice', checked);
+						}}
+					/>
+				)}
 			</BaseControl>
+			<div className='components-base-control -custom-image'>
+				<div className='components-base-control__field'>
+					<div className='components-base-control__label'>商品カスタム画像</div>
+					<ExSettting />
+				</div>
+			</div>
 		</>
 	);
-});
+};

@@ -34,7 +34,10 @@ $btn_style = \POCHIPP::get_setting( 'btn_style' );
 							Lorem Ipsum Watch 商品タイトル 腕時計 ABC-Z3 最新 防水 ソーラー</a>
 						</div>
 						<div class="pochipp-box__info">Lorem Ipsum</div>
-						<div class="pochipp-box__price">¥10,000 <span>（2021/01/01 11:11時点 | 〇〇調べ）</span></div>
+						<div
+							data-disp-price="<?php echo esc_attr( \POCHIPP::get_setting( 'display_price' ) ); ?>"
+							class="pochipp-box__price"
+						>¥10,000 <span>（2021/01/01 11:11時点 | 〇〇調べ）</span></div>
 					</div>
 					<div class="pochipp-box__btns"
 						data-maxclmn-pc="<?php echo esc_attr( \POCHIPP::get_setting( 'max_column_pc' ) ); ?>"
@@ -161,6 +164,21 @@ $btn_style = \POCHIPP::get_setting( 'btn_style' );
 			?>
 		</dd>
 	</dl>
+	<dl class="pchpp-setting__dl">
+		<dt>商品の価格表示</dt>
+		<dd>
+			<?php
+			\POCHIPP::output_radio([
+				'key'     => 'display_price',
+				'class'   => '-flex',
+				'choices' => [
+					'on'  => '表示',
+					'off' => '非表示',
+				],
+			]);
+			?>
+		</dd>
+	</dl>
 </div>
 
 
@@ -213,9 +231,42 @@ $btn_style = \POCHIPP::get_setting( 'btn_style' );
 </div>
 
 
-<h3 class="pchpp-setting__h3">カスタムボタンの色</h3>
+<h3 class="pchpp-setting__h3">各ボタンの色</h3>
 <!-- <p class="pchpp-setting__p"></p> -->
 <div class="pchpp-setting__div">
+	<dl class="pchpp-setting__dl">
+		<dt>Amazon</dt>
+		<dd>
+			<?php
+			\POCHIPP::output_colorpicker([
+				'key'     => 'amazon_btn_color',
+				'default' => \Pochipp::$default_data['amazon_btn_color'],
+			]);
+			?>
+		</dd>
+	</dl>
+	<dl class="pchpp-setting__dl">
+		<dt>楽天</dt>
+		<dd>
+			<?php
+			\POCHIPP::output_colorpicker([
+				'key'     => 'rakuten_btn_color',
+				'default' => \Pochipp::$default_data['rakuten_btn_color'],
+			]);
+			?>
+		</dd>
+	</dl>
+	<dl class="pchpp-setting__dl">
+		<dt>Yahooショッピング</dt>
+		<dd>
+			<?php
+			\POCHIPP::output_colorpicker([
+				'key'     => 'yahoo_btn_color',
+				'default' => \Pochipp::$default_data['yahoo_btn_color'],
+			]);
+			?>
+		</dd>
+	</dl>
 	<dl class="pchpp-setting__dl">
 		<dt>カスタムボタン1</dt>
 		<dd>

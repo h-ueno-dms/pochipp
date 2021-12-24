@@ -7,7 +7,7 @@ import ServerSideRender from '@wordpress/server-side-render';
 /**
  * ItemPreview
  */
-export default memo(({ postTitle, parsedMeta }) => {
+export default memo(({ postTitle, customImgUrl, parsedMeta }) => {
 	// 投稿タイトルもmeta情報も持たないとき。
 	if (!postTitle && 0 === Object.keys(parsedMeta).length) {
 		return (
@@ -25,7 +25,12 @@ export default memo(({ postTitle, parsedMeta }) => {
 	let dataBtnStyle = pchppVars.btnStyle || 'dflt';
 	if ('default' === dataBtnStyle) dataBtnStyle = 'dflt';
 
-	const hidePrice = parsedMeta.hidePrice || false;
+	let showPrice = pchppVars.displayPrice !== 'off';
+	if (!showPrice && parsedMeta.showPrice) {
+		showPrice = true;
+	} else if (showPrice && parsedMeta.hidePrice) {
+		showPrice = false;
+	}
 
 	return (
 		<div className='__preview'>
@@ -38,12 +43,12 @@ export default memo(({ postTitle, parsedMeta }) => {
 				data-btn-radius={pchppVars.btnRadius || 'off'}
 			>
 				<div className='pochipp-box__image'>
-					<img src={parsedMeta.image_url} alt='' />
+					<img src={customImgUrl || parsedMeta.image_url} alt='' />
 				</div>
 				<div className='pochipp-box__body'>
 					<div className='pochipp-box__title'>{postTitle}</div>
 					{info && <div className='pochipp-box__info'>{info}</div>}
-					{price && !hidePrice && (
+					{price && showPrice && (
 						<div className='pochipp-box__price'>
 							¥{price.toLocaleString()}
 							<span>

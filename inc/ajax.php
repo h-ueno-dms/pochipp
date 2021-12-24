@@ -25,7 +25,7 @@ function check_ajax_nonce( $request_key = 'nonce', $nonce_key = '' ) {
 	return false;
 }
 
-
+require_once POCHIPP_PATH . 'inc/ajax/auto_update.php';
 require_once POCHIPP_PATH . 'inc/ajax/search_amazon.php';
 require_once POCHIPP_PATH . 'inc/ajax/search_rakuten.php';
 require_once POCHIPP_PATH . 'inc/ajax/search_yahoo.php';
@@ -119,11 +119,13 @@ function registerd_by_block() {
 	unset( $attrs['className'] );
 	unset( $attrs['pid'] );
 	unset( $attrs['hideInfo'] );
-	unset( $attrs['hidePrice'] );
+	// unset( $attrs['hidePrice'] );
+	// unset( $attrs['showPrice'] );
 	unset( $attrs['hideAmazon'] );
 	unset( $attrs['hideRakuten'] );
 	unset( $attrs['hideYahoo'] );
 	unset( $attrs['hideCustom'] );
+	unset( $attrs['hideCustom2'] );
 
 	$new_id = wp_insert_post( [
 		'post_type'      => \POCHIPP::POST_TYPE_SLUG,

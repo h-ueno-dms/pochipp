@@ -51,6 +51,28 @@ trait Setting {
 		<?php
 	}
 
+	/**
+	 * 固定テキストを出力する
+	 */
+	public static function output_hiddentext( $args ) {
+		$key  = $args['key'] ?? '';
+		$name = $args['name'] ?? \POCHIPP::DB_NAME;
+		$val  = $args['val'] ?: \POCHIPP::get_setting( $key );
+		$text = $args['text'] ?? $val;
+
+		$name = $name . '[' . $key . ']';
+
+		?>
+		<div class="pchpp-setting__field">
+			<div class="pchpp-setting__item">
+				<?php //phpcs:ignore ?>
+                <p><span><?php echo $text; ?></span></p>
+				<input type="hidden" id="<?php echo esc_attr( $key ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $val ); ?>" >
+			</div>
+		</div>
+		<?php
+	}
+
 
 	/**
 	 * ラジオボタンを出力する
@@ -60,8 +82,9 @@ trait Setting {
 		$key     = $args['key'] ?? '';
 		$choices = $args['choices'] ?? '';
 		$class   = $args['class'] ?? '';
+		$name    = $args['name'] ?? \POCHIPP::DB_NAME;
 
-		$name = \POCHIPP::DB_NAME . '[' . $key . ']';
+		$name = $name . '[' . $key . ']';
 		$val  = \POCHIPP::get_setting( $key );
 
 		?>

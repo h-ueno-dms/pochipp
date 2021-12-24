@@ -13,6 +13,19 @@ function front_scripts() {
 
 
 /**
+ * for Front (at footer)
+ */
+add_action( 'wp_footer', 'POCHIPP\front_scripts_footer' );
+function front_scripts_footer() {
+
+	// 自動アップデート
+	if ( \POCHIPP::$load_update_js ) {
+		wp_enqueue_script( 'pochipp-front', POCHIPP_URL . 'dist/js/update.js', [], \POCHIPP::$version, true );
+	}
+}
+
+
+/**
  * for Admin
  */
 add_action( 'admin_enqueue_scripts', 'POCHIPP\admin_scripts' );
@@ -54,6 +67,9 @@ function admin_scripts( $hook_suffix ) {
 		wp_enqueue_style( 'datetimepicker', POCHIPP_URL . 'assets/datetimepicker/jquery.datetimepicker.min.css', [], \POCHIPP::$version );
 		wp_enqueue_script( 'datetimepicker', POCHIPP_URL . 'assets/datetimepicker/jquery.datetimepicker.full.min.js', [ 'jquery' ], \POCHIPP::$version, true );
 		wp_enqueue_script( 'pochipp-datetimepicker', POCHIPP_URL . 'dist/js/datepicker.js', [], \POCHIPP::$version, true );
+
+		// バリデーション
+		wp_enqueue_script( 'pochipp-validator', POCHIPP_URL . 'dist/js/validation.js', [], \POCHIPP::$version, true );
 
 	}
 }

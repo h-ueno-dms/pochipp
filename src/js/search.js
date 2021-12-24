@@ -50,9 +50,12 @@ const getItemList = (itemDatas, type) => {
 			info = `<div class='pochipp-item__info'>${item.info}</div>`;
 		}
 
-		let imageUrl = item.image_url;
 		// 商品画像
-		if (imageUrl) {
+		let imageUrl = item.image_url;
+		const customImageUrl = item.custom_image_url || '';
+		if (customImageUrl) {
+			imageUrl = customImageUrl;
+		} else if (imageUrl) {
 			if ('rakuten' === searchedAt) {
 				imageUrl += '?_ex=100x100';
 			}

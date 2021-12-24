@@ -9,6 +9,24 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 	</div>
 </div>
 
+<h3 class="pchpp-setting__h3">
+	セールの自動取得
+	<?php if ( ! has_action( 'pochipp_pro_sale_infobar' ) ) echo '・セール時のお知らせバー設定'; ?>
+</h3>
+<div class="pchpp-setting__div">
+	<dl class="pchpp-setting__dl">
+		<dd>
+			<?php if ( has_action( 'pochipp_pro_auto_sale_info' ) ) : ?>
+				<?php do_action( 'pochipp_pro_auto_sale_info' ); ?>
+			<?php else : ?>
+				この機能は<a href="https://pochipp.com/pochipp-pro/" target="_blank" rel="noopener noreferrer">Pro版</a>のみご利用いただけます。
+			<?php endif; ?>
+		</dd>
+	</dl>
+</div>
+
+<?php if ( has_action( 'pochipp_pro_sale_infobar' ) ) do_action( 'pochipp_pro_sale_infobar' ); ?>
+
 <h3 class="pchpp-setting__h3">Amazonセール情報</h3>
 <!-- <p class="pchpp-setting__p"></p> -->
 <div class="pchpp-setting__div">
